@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trust Bill Market — Flagship App Landing</title>
+  <meta name="description" content="Trust Bill Market — Buy & sell locally. Post items, chat, and close deals fast. Download the mobile app for the full experience." />
+  <meta name="theme-color" content="#000000">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.16.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.16.0/firebase-auth-compat.js"></script>
+
+  <style>
+    :root{
+      --bg:#000000;
+      --panel:#0b0b0b;
+      --muted:#a8a8a8;
+      --accent:#FFD700;
+      --glass: rgba(255,255,255,0.03);
+      --container:1200px;
+      --radius:14px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
+      background:linear-gradient(180deg,#000,#071012 60%);
+      color:#fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      line-height:1.4;
+    }
+
+    .wrap{max-width:var(--container);margin:0 auto;padding:28px}
+
+    /* NAV */
+    header{position:sticky;top:12px;z-index:100}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;backdrop-filter:blur(6px)}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:54px;height:54px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+    .logo img{width:100%;height:100%;object-fit:cover}
+    nav a{color:var(--muted);text-decoration:none;padding:8px 10px;border-radius:10px;display:block}
+    nav a:hover{color:white;background:rgba(255,255,255,0.02)}
+    .cta{background:linear-gradient(90deg,var(--accent),#f1d27a);color:#081012;padding:10px 14px;border-radius:12px;font-weight:700}
+
+    .menu{display:flex;gap:12px;align-items:center}
+    .menu-toggle{display:none;flex-direction:column;gap:4px;cursor:pointer}
+    .menu-toggle span{width:24px;height:3px;background:white;border-radius:2px}
+
+    @media (max-width:768px){
+      .menu{display:none;position:absolute;top:70px;right:20px;background:#0b0b0b;border-radius:12px;padding:12px;flex-direction:column;align-items:flex-start;gap:8px;min-width:180px}
+      .menu.open{display:flex}
+      .menu-toggle{display:flex}
+    }
+
+    /* HERO */
+    .hero{display:grid;grid-template-columns:1fr 520px;gap:28px;align-items:center;min-height:78vh;padding-top:18px}
+    .hero h1{font-family:'Playfair Display';font-weight:700;font-size:46px;margin:6px 0;line-height:1.02}
+    .lead{color:var(--muted);font-size:18px;margin-bottom:18px;max-width:680px}
+    .buttons{display:flex;gap:12px;flex-wrap:wrap}
+
+    /* device mockup */
+    .device{border-radius:22px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;box-shadow:0 30px 70px rgba(3,6,10,0.7);display:flex;gap:12px;align-items:center;justify-content:center}
+    .screens{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .screen{width:240px;height:460px;border-radius:18px;overflow:hidden;border:3px solid rgba(255,215,0,0.03);background:#050505;display:flex;align-items:center;justify-content:center}
+    .screen img{width:100%;height:100%;object-fit:cover}
+
+    /* Features */
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px}
+    .feature{background:var(--panel);padding:20px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .feature h3{margin:0 0 8px;color:var(--accent)}
+    .muted{color:var(--muted)}
+
+    /* Screenshots carousel */
+    .carousel{margin-top:28px;border-radius:12px;overflow:hidden}
+    .carousel-inner{display:flex;gap:12px;transition:transform .45s cubic-bezier(.2,.9,.2,1)}
+    .shot{min-width:320px;height:640px;border-radius:12px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .shot img{width:100%;height:100%;object-fit:cover}
+
+    /* Testimonials */
+    .testimonials{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .testimonial{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border:1px solid rgba(255,255,255,0.03)}
+
+    /* Login Section */
+    #login{margin-top:60px;padding:28px;background:var(--panel);border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    #login input{width:100%;padding:12px;border-radius:8px;border:none;background:#111;color:#fff;}
+    #login button{cursor:pointer}
+
+    /* CTA section */
+    .cta-strip{margin-top:40px;padding:28px;border-radius:12px;background:linear-gradient(90deg, rgba(255,215,0,0.06), rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+    footer{margin-top:36px;color:var(--muted);padding-bottom:60px}
+
+    /* responsive */
+    @media (max-width:1100px){
+      .hero{grid-template-columns:1fr 1fr}
+      .screens{grid-template-columns:1fr}
+    }
+    @media (max-width:820px){
+      .hero{grid-template-columns:1fr;padding-top:90px}
+      .device{display:none}
+      .features{grid-template-columns:1fr}
+      .testimonials{grid-template-columns:1fr}
+      .carousel{overflow:auto}
+      .shot{min-width:240px;height:480px}
+    }
+    @media (max-width:600px){
+      .wrap{padding:18px}
+      .hero h1{font-size:32px;line-height:1.2}
+      .lead{font-size:16px}
+      nav a{padding:6px 8px;font-size:14px}
+      .logo{width:42px;height:42px}
+      .features{margin-top:24px}
+      .cta-strip{flex-direction:column;text-align:center}
+      .cta-strip h2{font-size:20px}
+      .cta-strip p{font-size:14px}
+      .cta-strip>div:last-child{flex-wrap:wrap;justify-content:center}
+    }
+    @media (max-width:420px){
+      .hero h1{font-size:26px}
+      .lead{font-size:15px}
+      .buttons{flex-direction:column}
+      .btn{width:100%;justify-content:center}
+      .shot{min-width:200px;height:400px}
+      footer>div{flex-direction:column;text-align:center}
+    }
+
+    /* micro interactions */
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-weight:600}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .fancy{transition:transform .28s ease, box-shadow .28s ease}
+    .fancy:hover{transform:translateY(-6px);box-shadow:0 14px 40px rgba(0,0,0,0.6)}
+
+    a:focus, button:focus, input:focus{outline:3px solid rgba(255,215,0,0.12);outline-offset:2px}
+    .center{text-align:center}
+
+    /* Scroll animations */
+    [data-animate]{opacity:0;transform:translateY(40px);transition:opacity .8s ease, transform .8s ease;}
+    [data-animate].visible{opacity:1;transform:translateY(0);}
+  </style>
+</head>
+<body>
+  <header class="wrap" data-animate>
+    <nav class="nav" aria-label="Main navigation">
+      <div class="brand">
+        <div class="logo"><img src="logo.png" alt="Trust Bill Market logo"></div>
+        <div>
+          <div style="font-weight:700">Trust Bill Market</div>
+          <div style="font-size:12px;color:var(--muted)">Buy & sell with confidence</div>
+        </div>
+      </div>
+
+      <div class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </div>
+
+      <div class="menu" id="menu">
+        <a href="#features">Features</a>
+        <a href="#screens">Screens</a>
+        <a href="#testimonials">Testimonials</a>
+        <a href="#login">Login</a>
+        <a href="#download" class="cta">Download App</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-heading" data-animate>
+      <div>
+        <span style="color:var(--accent);font-weight:700;letter-spacing:1px">LAUNCH & SELL — FAST</span>
+        <h1 id="hero-heading">Trust Bill Market — Local buy & sell made simple</h1>
+        <p class="lead">Post items in seconds, chat with verified buyers, accept payments and grow your local reach. Designed for students, small businesses, and everyday sellers.</p>
+
+        <div class="buttons">
+          <a class="btn fancy cta" href="#download" aria-label="Download on Google Play">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#000" d="M12 2L2 12l10 10 10-10L12 2z"/></svg>
+            Get the App
+          </a>
+          <a class="btn fancy ghost" href="#features">How it works</a>
+        </div>
+
+        <div class="features" id="features" data-animate>
+          <div class="feature"><h3>Verified Sellers</h3><p class="muted">Profiles verified to reduce fraud — sellers build trust and buyers gain confidence.</p></div>
+          <div class="feature"><h3>AI Chat Assistant</h3><p class="muted">Smart chat to help you price items, write listings, and respond to buyers faster.</p></div>
+          <div class="feature"><h3>Multi-category Marketplace</h3><p class="muted">Electronics, cars, jobs, lodges, services — everything in one place.</p></div>
+        </div>
+      </div>
+
+      <aside class="device" aria-hidden="true" data-animate>
+        <div class="screens" id="screens">
+          <div class="screen fancy"><img src="Screenshot_20251104-164706.jpg" alt="App home screen"/></div>
+          <div class="screen fancy"><img src="Screenshot_20251104-171658.jpg" alt="Product card screen"/></div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Carousel -->
+    <section class="carousel center" data-animate>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <h2 style="font-family:'Playfair Display'">App Screens</h2>
+        <div style="display:flex;gap:8px">
+          <button id="prevShot" aria-label="Previous screenshot" class="btn ghost">◀</button>
+          <button id="nextShot" aria-label="Next screenshot" class="btn ghost">▶</button>
+        </div>
+      </div>
+      <div style="overflow:hidden;margin-top:12px">
+        <div class="carousel-inner" id="carouselInner">
+          <div class="shot"><img src="Screenshot_20251104-164632.jpg" alt="Product detail screenshot"/></div>
+          <div class="shot"><img src="Screenshot_20251104-164706.jpg" alt="homepage page screenshot"/></div>
+          <div class="shot"><img src="Screenshot_20251104-173909.jpg" alt="Chat screenshot"/></div>
+                    <div class="shot"><img src="Screenshot_20251104-174153.jpg" alt="profilepage screenshot"/></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" data-animate>
+      <h2 style="font-family:'Playfair Display'">What Sellers Say</h2>
+      <div class="testimonials">
+        <div class="testimonial"><strong>Aisha M.</strong><p class="muted">"I sold my phone within 24 hours. Verified buyers and quick chat made it easy."</p></div>
+        <div class="testimonial"><strong>Chinedu O.</strong><p class="muted">"The AI chat helped me write a better listing — got more offers."</p></div>
+        <div class="testimonial"><strong>University Store</strong><p class="muted">"Great for moving inventory fast on campus."</p></div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS SECTION (HIDDEN BY DEFAULT) -->
+<section id="products" style="display:none;margin-top:40px;" data-animate>
+  <h2 style="font-family:'Playfair Display'" class="center">Available Products</h2>
+  <div id="productGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:20px;"></div>
+</section>
+
+
+    <!-- Login/Signup -->
+    <section id="login" data-animate>
+      <h2 class="center">Login to Your Account</h2>
+      <form id="loginForm" class="center" style="max-width:360px;margin:auto;display:flex;flex-direction:column;gap:12px;">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit" class="btn cta">Login</button>
+        <p class="muted center">Don't have an account? <a href="#" id="signupLink">Sign up</a></p>
+        <p id="loginError" class="muted center"></p>
+      </form>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-strip" id="download" data-animate>
+      <div>
+        <h2 style="margin:0">Ready to sell your first item?</h2>
+        <p class="muted" style="margin:6px 0 0">Download Trust Bill Market and start posting in under 2 minutes.</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <a class="btn cta" href="#" role="button">Google Play</a>
+        <a class="btn cta" href="#" role="button">App Store</a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="wrap" data-animate>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-weight:700">Trust Bill Market</div>
+          <div class="muted">© Trust Bill Limited • Built for trust</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <a class="muted" href="#">Privacy</a>
+          <a class="muted" href="#">Terms</a>
+          <a class="muted" href="#">Contact</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+  // Hamburger menu toggle
+  const menuToggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('menu');
+  menuToggle.addEventListener('click',()=>menu.classList.toggle('open'));
+
+  // Simple carousel controls
+  const inner = document.getElementById('carouselInner');
+  const next = document.getElementById('nextShot');
+  const prev = document.getElementById('prevShot');
+  let idx = 0; const shots = inner.children.length;
+  function updateCarousel() {
+    const w = inner.children[0].getBoundingClientRect().width + 12;
+    inner.style.transform = `translateX(${-idx * w}px)`;
+  }
+  next?.addEventListener('click',()=>{ idx = Math.min(idx+1,shots-1); updateCarousel(); });
+  prev?.addEventListener('click',()=>{ idx = Math.max(idx-1,0); updateCarousel(); });
+  window.addEventListener('resize',updateCarousel);
+  window.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'){ idx=Math.min(idx+1,shots-1); updateCarousel();}
+    if(e.key==='ArrowLeft'){ idx=Math.max(idx-1,0); updateCarousel();}
+  });
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      const href=a.getAttribute('href');
+      if(href&&href.length>1){
+        e.preventDefault();
+        document.querySelector(href)?.scrollIntoView({behavior:'smooth'});
+        menu.classList.remove('open');
+      }
+    });
+  });
+
+  // Scroll animations
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+      } else {
+        entry.target.classList.remove('visible');
+      }
+    });
+  },{threshold:0.1});
+  document.querySelectorAll('[data-animate]').forEach(el=>observer.observe(el));
+
+  // Firebase Initialization (replace with your config)
+  const firebaseConfig = {
+      apiKey: "AIzaSyAlexs5_Z3ANKRWX2K5mQtqeTH5k4Ay70U",
+      projectId: "trustbillmarketplace",
+      storageBucket: "trustbillmarketplace.appspot.com",
+      messagingSenderId: "638637181528",
+      appId: "1:638637181528:android:efa7d65c7b3cf7718dd82d",
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Login Form & Products
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('loginError');
+  const productsSection = document.getElementById('products');
+  const productGrid = document.getElementById('productGrid');
+
+  loginForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    auth.signInWithEmailAndPassword(email,password)
+      .then(userCredential=>{
+        loginError.textContent = '';
+        loginForm.style.display = 'none';         // Hide login form
+        productsSection.style.display = 'block';  // Show products
+
+        // Fetch products from Firestore
+        db.collection('products').get().then(snapshot=>{
+          productGrid.innerHTML=''; // clear previous
+          snapshot.forEach(doc=>{
+            const data = doc.data();
+            const card = document.createElement('div');
+            card.style.background='var(--panel)';
+            card.style.padding='12px';
+            card.style.borderRadius='12px';
+            card.style.textAlign='center';
+            card.innerHTML = `
+              <img src="${data.image}" alt="${data.name}" style="width:100%;height:180px;object-fit:cover;border-radius:10px;">
+              <h3 style="margin:8px 0 4px;color:var(--accent)">${data.name}</h3>
+              <p class="muted" style="margin:4px 0">${data.description}</p>
+              <p style="font-weight:700;margin:4px 0">₦${data.price}</p>
+            `;
+            productGrid.appendChild(card);
+          });
+        });
+
+      })
+      .catch(error=>loginError.textContent = error.message);
+  });
+
+  // Signup link (optional)
+  const signupLink = document.getElementById('signupLink');
+  signupLink?.addEventListener('click', e=>{
+    e.preventDefault();
+    const email = prompt("Enter email for signup");
+    const password = prompt("Enter password (min 6 chars)");
+    if(email && password){
+      auth.createUserWithEmailAndPassword(email,password)
+        .then(userCredential=>alert(`Account created for ${userCredential.user.email}`))
+        .catch(error=>alert(error.message));
+    }
+  });
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.16.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.16.0/firebase-auth-compat.js"></script>
+
+
+</body>
+</html>
